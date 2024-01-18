@@ -1,5 +1,7 @@
-FROM apline:3.10
+FROM golang:1.21-alpine
 
-COPY entrypoint.sh /entrypoint.sh
+COPY . /home/src
+WORKDIR /home/src
+RUN go build - /bin/action ./cmd/main.go
 
-ENTRYPOINT [ "./entrypoint.sh" ]
+ENTRYPOINT [ "/bin/action" ]
