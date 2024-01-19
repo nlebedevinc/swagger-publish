@@ -1,0 +1,25 @@
+name: nlebedevinc/swagger-publish
+description: "Very simple but yet powerfull Github action to publish Swagger API documentation to SwaggerHub"
+inputs:
+  name: 
+    default: ""
+    description: "Name of the API docs"
+    required: false
+  domain:
+    default: ""
+    description: "Registered SwaggerHub account or enterprise domain"
+    required: true
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    GITHUB_TOKEN: "${{ inputs.GITHUB_TOKEN }}"
+    GIT_BRANCH: "${{ inputs.GIT_BRANCH}}"
+    SWAGGERHUB_API_KEY: "${{ inputs.SWAGGERHUB_API_KEY }}"
+    SWAGGER_FILE: "${{ inputs.SWAGGER_FILE }}"
+  args:
+    - "-name=${{ inputs.name }}"
+    - "-domain=${{ inputs.domain}}"
+branding:
+  icon: activity
+  color: green
