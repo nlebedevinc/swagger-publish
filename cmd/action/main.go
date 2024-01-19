@@ -54,6 +54,8 @@ func publish(openApi map[string]interface{}, key, domain, apiName, apiVersion st
 	if err != nil {
 		return fmt.Errorf("failed to parse swagger.json with OpenAPI standard: %s", err)
 	}
+	fmt.Printf("Payload: %d", len(payload))
+	fmt.Printf("URL: %s", url)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
 	if err != nil {
@@ -68,6 +70,8 @@ func publish(openApi map[string]interface{}, key, domain, apiName, apiVersion st
 		return fmt.Errorf("failed to submit request over SwaggerHub: %s", err)
 	}
 	defer res.Body.Close()
+
+	fmt.Printf("Status code: %d", res.StatusCode)
 
 	if res.StatusCode != http.StatusOK {
 		resBody, _ := ioutil.ReadAll(res.Body)
@@ -91,12 +95,14 @@ func main() {
 		fmt.Println("Empty version, skipping upload")
 		return
 	}
+	fmt.Printf("Version: %s\n", version)
 
 	fileBytes, err := ioutil.ReadFile(swaggerFile)
 	if err != nil {
 		fmt.Printf("Error reading swagger.json: %s\n", err)
 		return
 	}
+	fmt.Printf("File bytes: %d\n", len(fileBytes))
 
 	var openAPI map[string]interface{}
 	err = json.Unmarshal(fileBytes, &openAPI)
