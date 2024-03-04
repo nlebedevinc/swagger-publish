@@ -8,20 +8,22 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
 // all of the env params and inputs are defined here
 var (
 	//required
-	path    = flag.String("path", ".", "Path to main Go main package.")
-	name    = flag.String("name", "", "Override action name, the default name is the package name.")
-	desc    = flag.String("desc", "", "Override action description, the default description is the package synopsis.")
-	image   = flag.String("image", "golang:1.14.2-alpine3.11", "Override Docker image to run the action with (See https://hub.docker.com/_/golang?tab=tags).")
-	install = flag.String("install", "", "Comma separated list of requirements to 'apk add'.")
-	icon    = flag.String("icon", "", "Set branding icon. (See options at https://feathericons.com).")
-	color   = flag.String("color", "", "Set branding color. (white, yellow, blue, green, orange, red, purple or gray-dark).")
-	domain  = flag.String("domain", "", "Company domain associated with registered corporate accound in SwaggerHub (See account at https://swagger.io)")
+	path      = flag.String("path", ".", "Path to main Go main package.")
+	name      = flag.String("name", "", "Override action name, the default name is the package name.")
+	desc      = flag.String("desc", "", "Override action description, the default description is the package synopsis.")
+	image     = flag.String("image", "golang:1.14.2-alpine3.11", "Override Docker image to run the action with (See https://hub.docker.com/_/golang?tab=tags).")
+	install   = flag.String("install", "", "Comma separated list of requirements to 'apk add'.")
+	icon      = flag.String("icon", "", "Set branding icon. (See options at https://feathericons.com).")
+	color     = flag.String("color", "", "Set branding color. (white, yellow, blue, green, orange, red, purple or gray-dark).")
+	domain    = flag.String("domain", "", "Company domain associated with registered corporate accound in SwaggerHub (See account at https://swagger.io)")
+	isPrivate = flag.Bool("private", false, "Company domain associated with registered corporate accound in SwaggerHub (See account at https://swagger.io)")
 
 	//description Email for commit message.
 	//default posener@gmail.com
@@ -45,10 +47,10 @@ func prepareVersion() string {
 	return version
 }
 
-func publish(openApi map[string]interface{}, key, domain, apiName, apiVersion string) error {
+func publish(openApi map[string]interface{}, key, domain, apiName, apiVersion string, isPrivate bool) error {
 	// oas 3.0 and private only for now
 	// just to make it work and test
-	url := fmt.Sprintf("https://api.swaggerhub.com/apis/%s/%s?version=%s&oas=3.0&isPrivate=true&force=true", domain, apiName, apiVersion)
+	url := fmt.Sprintf("https://api.swaggerhub.com/apis/%s/%s?version=%s&oas=3.0&isPrivate=%s&force=true", domain, apiName, apiVersion, strconv.FormatBool(isPrivate))
 
 	payload, err := json.Marshal(openApi)
 	if err != nil {
@@ -111,7 +113,7 @@ func main() {
 		return
 	}
 
-	err = publish(openAPI, swaggerhubApiKey, *domain, *name, version)
+	err = publish(openAPI, swaggerhubApiKey, *domain, *name, version, *isPrivate)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		return
